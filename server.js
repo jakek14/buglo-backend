@@ -1,7 +1,10 @@
 const express = require("express");
 const cors = require("cors");
-const fetch = require("node-fetch");
 require("dotenv").config();
+
+// Shim fetch for Node.js (fixes the 'fetch is not a function' error)
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 const app = express();
 app.use(cors());
@@ -31,6 +34,9 @@ app.post("/fix-code", async (req, res) => {
   res.json({ result: output });
 });
 
-app.listen(3001, () => {
-  console.log("✅ Server running on http://localhost:3001");
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
+
+// Test change to trigger deployment
