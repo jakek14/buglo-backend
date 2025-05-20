@@ -14,10 +14,6 @@ app.post("/fix-code", async (req, res) => {
   try {
     const { code } = req.body;
 
-    if (!code) {
-      return res.status(400).json({ result: "No code provided." });
-    }
-
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -33,13 +29,13 @@ app.post("/fix-code", async (req, res) => {
 
     const data = await response.json();
     const output = data.choices?.[0]?.message?.content || "No response";
-
     res.json({ result: output });
   } catch (err) {
     console.error("❌ DeepSeek API error:", err);
     res.status(500).json({ result: "Something went wrong on the server." });
   }
 });
+
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
