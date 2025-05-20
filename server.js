@@ -11,11 +11,9 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/fix-code", async (req, res) => {
-  const { code, prompt } = req.body;
-
-  const finalPrompt = `You're an expert developer. Help a beginner understand what's wrong with this code and how to fix it. Be clear, beginner-friendly, and efficient. Here's their question: "${prompt}"\n\nCode:\n${code}`;
-
   try {
+    const { prompt } = req.body;
+
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -24,14 +22,15 @@ app.post("/fix-code", async (req, res) => {
       },
       body: JSON.stringify({
         model: "deepseek-coder",
-        messages: [{ role: "user", content: finalPrompt }],
+        messages: [{ role: "user", content: prompt }],
         temperature: 0.3,
       }),
     });
 
     const data = await response.json();
     const output = data.choices?.[0]?.message?.content || "No response";
-    res.json({ result: output });
+
+    res.json({ result: output }); // ✅ What your frontend expects
   } catch (err) {
     console.error("❌ DeepSeek API error:", err);
     res.status(500).json({ result: "Something went wrong on the server." });
